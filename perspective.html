@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+<canvas id="gl-canvas" width="512" height="512"> </canvas>
+
+<p> </p>
+<button id = "Button1">Increase Z</button>
+<button id = "Button2">Decrease Z</button>
+<button id = "Button3">Increase R</button>
+<button id = "Button4">Decrease R</button>
+
+<p> </p>
+<button id = "Button5">Increase theta</button>
+<button id = "Button6">Decrease theta</button>
+<button id = "Button7">Increase phi</button>
+<button id = "Button8">Decrease phi</button>
+<p> </p>
+
+
+<script id="vertex-shader" type="x-shader/x-vertex">
+    #version 300 es
+
+    in  vec4 aPosition;
+    in  vec4 aColor;
+    in  vec3 aNormal;  // Tambah normal
+    
+    out vec4 vColor;
+    out vec3 vNormal;  // Interpolasi normal ke fragment shader
+    out vec3 vPosition; // Interpolasi posisi untuk hitungan lighting
+    
+    uniform mat4 uModelViewMatrix;
+    uniform mat4 uProjectionMatrix;
+    uniform mat3 uNormalMatrix;  // Matriks untuk normal transformasi
+    
+    void main()
+    {
+        gl_Position = uProjectionMatrix * uModelViewMatrix * aPosition;
+        vColor = aColor;
+        vNormal = uNormalMatrix * aNormal; // Transform normal
+        vPosition = (uModelViewMatrix * aPosition).xyz; // Posisi vertex di ruang kamera
+    }
+    
+</script>
+
+<script id="fragment-shader" type="x-shader/x-fragment">
+    #version 300 es
+
+    precision mediump float;
+    
+    in vec4 vColor;
+    in vec3 vNormal;   // Normal dari vertex shader
+    in vec3 vPosition; // Posisi dari vertex shader
+    
+    out vec4 fColor;
+    
+    uniform vec3 uLightPosition;  // Posisi sumber cahaya
+    uniform vec3 uLightColor;     // Warna sumber cahaya
+    uniform vec3 uAmbientLight;   // Intensitas cahaya ambient
+    
+    void main()
+    {
+        // Normalisasi normal
+        vec3 normal = normalize(vNormal);
+    
+        // Vektor ke sumber cahaya (posisi cahaya - posisi vertex)
+        vec3 lightDir = normalize(uLightPosition - vPosition);
+    
+        // Hitung pencahayaan difus (Lambertian)
+        float diff = max(dot(lightDir, normal), 0.0);
+        vec3 diffuse = diff * uLightColor;
+    
+        // Kombinasi dengan ambient light
+        vec3 ambient = uAmbientLight * vColor.rgb;
+    
+        // Warna akhir dengan pencahayaan
+        vec3 finalColor = ambient + diffuse * vColor.rgb;
+    
+        fColor = vec4(finalColor, vColor.a); // Tetapkan ke fragmen akhir
+    }
+    
+</script>
+
+<script src="initShaders.js"></script>
+<script src="MVnew.js"></script>
+<script src="perspective.js"></script>
+
+</body>
+</html>
