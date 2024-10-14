@@ -1,3 +1,5 @@
+NOTE: kode masih cuman implementasi rumus, belum ada game design algorithm nya
+
 ### AKU MIKIRNYA BIAR SIMPLE NTAR KEK GAME ANGRY BIRD
 
 ## nanti di gambar bakal diketahui 
