@@ -1,96 +1,84 @@
 "use strict";
 
-var shadedCube = function() {
+var shadedCube = function () {
+  var canvas;
+  var gl;
 
-var canvas;
-var gl;
+  var numPositions = 36;
 
-var numPositions = 36;
+  var positionsArray = [];
+  var normalsArray = [];
 
-var positionsArray = [];
-var normalsArray = [];
+  var vertices = [vec4(-0.5, -0.5, 0.5, 1.0), vec4(-0.5, 0.5, 0.5, 1.0), vec4(0.5, 0.5, 0.5, 1.0), vec4(0.5, -0.5, 0.5, 1.0), vec4(-0.5, -0.5, -0.5, 1.0), vec4(-0.5, 0.5, -0.5, 1.0), vec4(0.5, 0.5, -0.5, 1.0), vec4(0.5, -0.5, -0.5, 1.0)];
 
-var vertices = [
-        vec4(-0.5, -0.5,  0.5, 1.0),
-        vec4(-0.5,  0.5,  0.5, 1.0),
-        vec4(0.5,  0.5,  0.5, 1.0),
-        vec4(0.5, -0.5,  0.5, 1.0),
-        vec4(-0.5, -0.5, -0.5, 1.0),
-        vec4(-0.5,  0.5, -0.5, 1.0),
-        vec4(0.5,  0.5, -0.5, 1.0),
-        vec4(0.5, -0.5, -0.5, 1.0)
-    ];
+  var lightPosition = vec4(1.0, 1.0, 1.0, 0.0);
+  var lightAmbient = vec4(0.5, 0.5, 0.5, 1.0);
+  var lightDiffuse = vec4(1.0, 1.0, 1.0, 1.0);
+  var lightSpecular = vec4(1.0, 1.0, 1.0, 1.0);
 
-var lightPosition = vec4(1.0, 1.0, 1.0, 0.0);
-var lightAmbient = vec4(0.5, 0.5, 0.5, 1.0);
-var lightDiffuse = vec4(1.0, 1.0, 1.0, 1.0);
-var lightSpecular = vec4(1.0, 1.0, 1.0, 1.0);
+  var materialAmbient = vec4(1.0, 0.0, 1.0, 1.0);
+  var materialDiffuse = vec4(1.0, 0.8, 0.0, 1.0);
+  var materialSpecular = vec4(1.0, 0.8, 0.0, 1.0);
+  var materialShininess = 20.0;
 
-var materialAmbient = vec4(1.0, 0.0, 1.0, 1.0);
-var materialDiffuse = vec4(1.0, 0.8, 0.0, 1.0);
-var materialSpecular = vec4(1.0, 0.8, 0.0, 1.0);
-var materialShininess = 20.0;
+  var ctm;
+  var ambientColor, diffuseColor, specularColor;
+  var modelViewMatrix, projectionMatrix;
+  var viewerPos;
+  var program;
 
-var ctm;
-var ambientColor, diffuseColor, specularColor;
-var modelViewMatrix, projectionMatrix;
-var viewerPos;
-var program;
+  var xAxis = 0;
+  var yAxis = 1;
+  var zAxis = 2;
+  var axis = 0;
+  var theta = vec3(0, 0, 0);
 
-var xAxis = 0;
-var yAxis = 1;
-var zAxis = 2;
-var axis = 0;
-var theta = vec3(0, 0, 0);
+  var thetaLoc;
 
-var thetaLoc;
+  var flag = false;
+  var position = vec3(-0.8, -0.5, -1.0);
+  var velocity = vec3(0.0, 0.0, 0.0);
+  var acceleration = vec3(0.0, 0.0, 0.0);
+  var mass = 1.0;
+  var gravity = vec3(0.0, -9.8, 0.0);
+  var restitution = 0.8;
 
-var flag = false;
-var position = vec3(-0.8, -0.5, -1.0);
-var velocity = vec3(0.0, 0.0, 0.0);
-var acceleration = vec3(0.0, 0.0, 0.0);
-var mass = 1.0;
-var gravity = vec3(0.0, -9.8, 0.0);
-var restitution = 0.8;
+  init();
 
-init();
+  function quad(a, b, c, d) {
+    var t1 = subtract(vertices[b], vertices[a]);
+    var t2 = subtract(vertices[c], vertices[b]);
+    var normal = cross(t1, t2);
+    normal = vec3(normal);
 
-function quad(a, b, c, d) {
+    positionsArray.push(vertices[a]);
+    normalsArray.push(normal);
+    positionsArray.push(vertices[b]);
+    normalsArray.push(normal);
+    positionsArray.push(vertices[c]);
+    normalsArray.push(normal);
+    positionsArray.push(vertices[a]);
+    normalsArray.push(normal);
+    positionsArray.push(vertices[c]);
+    normalsArray.push(normal);
+    positionsArray.push(vertices[d]);
+    normalsArray.push(normal);
+  }
 
-     var t1 = subtract(vertices[b], vertices[a]);
-     var t2 = subtract(vertices[c], vertices[b]);
-     var normal = cross(t1, t2);
-     normal = vec3(normal);
-
-     positionsArray.push(vertices[a]);
-     normalsArray.push(normal);
-     positionsArray.push(vertices[b]);
-     normalsArray.push(normal);
-     positionsArray.push(vertices[c]);
-     normalsArray.push(normal);
-     positionsArray.push(vertices[a]);
-     normalsArray.push(normal);
-     positionsArray.push(vertices[c]);
-     normalsArray.push(normal);
-     positionsArray.push(vertices[d]);
-     normalsArray.push(normal);
-}
-
-function colorCube()
-{
+  function colorCube() {
     quad(1, 0, 3, 2);
     quad(2, 3, 7, 6);
     quad(3, 0, 4, 7);
     quad(6, 5, 1, 2);
     quad(4, 5, 6, 7);
     quad(5, 4, 0, 1);
-}
+  }
 
-function init() {
+  function init() {
     canvas = document.getElementById("gl-canvas");
 
-    gl = canvas.getContext('webgl2');
-    if (!gl) alert( "WebGL 2.0 isn't available");
+    gl = canvas.getContext("webgl2");
+    if (!gl) alert("WebGL 2.0 isn't available");
 
     gl.viewport(0, 0, canvas.width, canvas.height);
     gl.clearColor(1.0, 0.0, 1.0, 1.0);
@@ -124,41 +112,66 @@ function init() {
 
     projectionMatrix = ortho(-1, 1, -1, 1, -100, 100);
 
-    document.getElementById("ButtonX").onclick = function(){axis = xAxis;};
-    document.getElementById("ButtonY").onclick = function(){axis = yAxis;};
-    document.getElementById("ButtonZ").onclick = function(){axis = zAxis;};
-    document.getElementById("ButtonT").onclick = function(){flag = !flag;};
+    document.getElementById("ButtonX").onclick = function () {
+      axis = xAxis;
+    };
+    document.getElementById("ButtonY").onclick = function () {
+      axis = yAxis;
+    };
+    document.getElementById("ButtonZ").onclick = function () {
+      axis = zAxis;
+    };
+    document.getElementById("ButtonT").onclick = function () {
+      flag = !flag;
+    };
 
     // Input untuk percepatan
-    document.getElementById("accelerationX").addEventListener("input", function(event) {
-        acceleration[0] = parseFloat(event.target.value);
+    document.getElementById("applyAccelerationX").addEventListener("click", function () {
+      acceleration[0] = parseFloat(document.getElementById("accelerationX").value);
     });
-    document.getElementById("accelerationY").addEventListener("input", function(event) {
-        acceleration[1] = parseFloat(event.target.value);
+    document.getElementById("applyAccelerationY").addEventListener("click", function () {
+      acceleration[1] = parseFloat(document.getElementById("accelerationY").value);
     });
-    document.getElementById("accelerationZ").addEventListener("input", function(event) {
-        acceleration[2] = parseFloat(event.target.value);
+    document.getElementById("applyAccelerationZ").addEventListener("click", function () {
+      acceleration[2] = parseFloat(document.getElementById("accelerationZ").value);
     });
 
-    // Input untuk kecepatan awal
-    document.getElementById("velocityX").addEventListener("input", function(event) {
-        velocity[0] = parseFloat(event.target.value);
+    document.getElementById("applyVelocityX").addEventListener("click", function () {
+      velocity[0] = parseFloat(document.getElementById("velocityX").value);
     });
-    document.getElementById("velocityY").addEventListener("input", function(event) {
-        velocity[1] = parseFloat(event.target.value);
+    document.getElementById("applyVelocityY").addEventListener("click", function () {
+      velocity[1] = parseFloat(document.getElementById("velocityY").value);
     });
-    document.getElementById("velocityZ").addEventListener("input", function(event) {
-        velocity[2] = parseFloat(event.target.value);
+    document.getElementById("applyVelocityZ").addEventListener("click", function () {
+      velocity[2] = parseFloat(document.getElementById("velocityZ").value);
     });
 
     // Input untuk massa
-    document.getElementById("mass").addEventListener("input", function(event) {
-        mass = parseFloat(event.target.value);
+    document.getElementById("applyMass").addEventListener("click", function () {
+      mass = parseFloat(document.getElementById("mass").value);
     });
 
     // Input untuk gravitasi
-    document.getElementById("gravity").addEventListener("input", function(event) {
-        gravity[1] = parseFloat(event.target.value);
+    document.getElementById("applyGravity").addEventListener("click", function () {
+      gravity[1] = parseFloat(document.getElementById("gravity").value);
+    });
+
+    // Tombol reset untuk mengatur ulang semua nilai ke kondisi awal
+    document.getElementById("resetValues").addEventListener("click", function () {
+      document.getElementById("accelerationX").value = 0;
+      document.getElementById("accelerationY").value = 0;
+      document.getElementById("accelerationZ").value = 0;
+      document.getElementById("velocityX").value = 0;
+      document.getElementById("velocityY").value = 0;
+      document.getElementById("velocityZ").value = 0;
+      document.getElementById("mass").value = 1;
+      document.getElementById("gravity").value = -9.8;
+
+      acceleration = vec3(0.0, 0.0, 0.0);
+      velocity = vec3(0.0, 0.0, 0.0);
+      mass = 1.0;
+      gravity = vec3(0.0, -9.8, 0.0);
+      position = vec3(-0.8, -0.5, -1.0);
     });
 
     updateLightColors();
@@ -178,9 +191,9 @@ function init() {
     document.getElementById("materialSpecular").addEventListener("input", updateMaterialColors);
 
     render();
-}
+  }
 
-function updateLightColors() {
+  function updateLightColors() {
     var ambientColor = hexToVec4(document.getElementById("ambientColor").value);
     var diffuseColor = hexToVec4(document.getElementById("diffuseColor").value);
     var specularColor = hexToVec4(document.getElementById("specularColor").value);
@@ -194,50 +207,49 @@ function updateLightColors() {
     gl.uniform4fv(gl.getUniformLocation(program, "uSpecularProduct"), specularProduct);
     gl.uniform1f(gl.getUniformLocation(program, "uShininess"), materialShininess);
     gl.uniformMatrix4fv(gl.getUniformLocation(program, "uProjectionMatrix"), false, flatten(projectionMatrix));
-}
+  }
 
-function updateMaterialColors() {
+  function updateMaterialColors() {
     materialAmbient = hexToVec4(document.getElementById("materialAmbient").value);
     materialDiffuse = hexToVec4(document.getElementById("materialDiffuse").value);
     materialSpecular = hexToVec4(document.getElementById("materialSpecular").value);
 
     updateLightColors(); // Perbarui produk pencahayaan dengan warna material baru
-}
+  }
 
-function updateLightPosition() {
+  function updateLightPosition() {
     var x = parseFloat(document.getElementById("lightX").value);
     var y = parseFloat(document.getElementById("lightY").value);
     var z = parseFloat(document.getElementById("lightZ").value);
-    
+
     lightPosition = vec4(x, y, z, 0.0);
     gl.uniform4fv(gl.getUniformLocation(program, "uLightPosition"), flatten(lightPosition));
-}
+  }
 
-function hexToVec4(hex) {
+  function hexToVec4(hex) {
     var bigint = parseInt(hex.slice(1), 16);
     var r = ((bigint >> 16) & 255) / 255;
     var g = ((bigint >> 8) & 255) / 255;
     var b = (bigint & 255) / 255;
     return vec4(r, g, b, 1.0);
-}
+  }
 
-function render(){
+  function render() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    if(flag) theta[axis] += 2.0;
+    if (flag) theta[axis] += 2.0;
 
     // Update fisika: kecepatan dan posisi
     var gravityEffect = scale(1.0 / mass, gravity); // Efek gravitasi tergantung pada massa
     var totalAcceleration = add(acceleration, gravityEffect); // Total percepatan = percepatan + gravitasi
     velocity = add(velocity, scale(0.01, totalAcceleration)); // velocity = velocity + totalAcceleration * deltaTime
-    position = add(position, scale(0.01, velocity));     // position = position + velocity * deltaTime
+    position = add(position, scale(0.01, velocity)); // position = position + velocity * deltaTime
 
-        // Deteksi tabrakan dengan lantai (y = -1.0) dan pemantulan
-        if (position[1] <= -1.0) {
-            position[1] = -1.0;
-            velocity[1] = -velocity[1] * restitution; // Pantulan dengan koefisien restitusi
-        }
-    
+    // Deteksi tabrakan dengan lantai (y = -1.0) dan pemantulan
+    if (position[1] <= -1.0) {
+      position[1] = -1.0;
+      velocity[1] = -velocity[1] * restitution; // Pantulan dengan koefisien restitusi
+    }
 
     modelViewMatrix = mat4();
     modelViewMatrix = mult(modelViewMatrix, translate(position[0], position[1], position[2]));
@@ -251,8 +263,7 @@ function render(){
     gl.drawArrays(gl.TRIANGLES, 0, numPositions);
 
     requestAnimationFrame(render);
-}
-
-}
+  }
+};
 
 shadedCube();
