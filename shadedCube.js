@@ -59,7 +59,6 @@ var shadedCube = function () {
   init();
 
   function Dodecahedron() {
-    // Define the vertices of a dodecahedron
     const A = (1 + Math.sqrt(5)) / 2; // The golden ratio
     const B = 1 / A;
 
@@ -86,7 +85,6 @@ var shadedCube = function () {
       vec4(-A, 0, -B, 1.0),
     ];
 
-    // Define the faces using the vertex indices
     var faces = [
       [0, 16, 2, 10, 8],
       [0, 8, 4, 14, 12],
@@ -102,50 +100,58 @@ var shadedCube = function () {
       [15, 7, 19, 18, 6],
     ];
 
-    // Array untuk warna-warna wajah dodecahedron
     var faceColors = [
-      vec4(1.0, 0.0, 0.0, 1.0), // Red
-      vec4(0.0, 1.0, 0.0, 1.0), // Green
-      vec4(0.0, 0.0, 1.0, 1.0), // Blue
-      vec4(1.0, 1.0, 0.0, 1.0), // Yellow
-      vec4(1.0, 0.0, 1.0, 1.0), // Magenta
-      vec4(0.0, 1.0, 1.0, 1.0), // Cyan
-      vec4(0.5, 0.5, 0.5, 1.0), // Grey
-      vec4(1.0, 0.5, 0.0, 1.0), // Orange
-      vec4(0.5, 0.0, 0.5, 1.0), // Purple
-      vec4(0.0, 0.5, 0.5, 1.0), // Teal
-      vec4(0.5, 0.5, 0.0, 1.0), // Olive
-      vec4(0.0, 0.0, 0.0, 1.0), // Black
+      vec4(1.0, 0.0, 0.0, 1.0),
+      vec4(0.0, 1.0, 0.0, 1.0),
+      vec4(0.0, 0.0, 1.0, 1.0),
+      vec4(1.0, 1.0, 0.0, 1.0),
+      vec4(1.0, 0.0, 1.0, 1.0),
+      vec4(0.0, 1.0, 1.0, 1.0),
+      vec4(0.5, 0.5, 0.5, 1.0),
+      vec4(1.0, 0.5, 0.0, 1.0),
+      vec4(0.5, 0.0, 0.5, 1.0),
+      vec4(0.0, 0.5, 0.5, 1.0),
+      vec4(0.5, 0.5, 0.0, 1.0),
+      vec4(0.0, 0.0, 0.0, 1.0),
     ];
 
-    // Generate triangles for each face with a single color per face
     for (var i = 0; i < faces.length; i++) {
       var face = faces[i];
-      var faceColor = faceColors[i]; // Warna untuk satu sisi
+      var faceColor = faceColors[i];
 
-      var center = vec4(0, 0, 0, 1.0);
-      // Calculate center of each face for triangle fan rendering
-      for (var j = 0; j < face.length; j++) {
-        center[0] += vertices[face[j]][0];
-        center[1] += vertices[face[j]][1];
-        center[2] += vertices[face[j]][2];
-      }
-      center[0] /= face.length;
-      center[1] /= face.length;
-      center[2] /= face.length;
+      for (var j = 1; j < face.length - 1; j++) {
+        // Triangle vertices
+        var v0 = vertices[face[0]];
+        var v1 = vertices[face[j]];
+        var v2 = vertices[face[j + 1]];
 
-      // Create triangles using triangle fan method with a single color per face
-      for (var j = 0; j < face.length; j++) {
-        positionsArray.push(vertices[face[j]]);
-        colorsArray.push(faceColor); // Assign the same color for each vertex of the face
+        // Add triangle vertices to positions array
+        positionsArray.push(v0);
+        positionsArray.push(v1);
+        positionsArray.push(v2);
 
-        positionsArray.push(vertices[face[(j + 1) % face.length]]);
-        colorsArray.push(faceColor); // Assign the same color for each vertex of the face
+        // Add colors
+        colorsArray.push(faceColor);
+        colorsArray.push(faceColor);
+        colorsArray.push(faceColor);
 
-        positionsArray.push(center);
-        colorsArray.push(faceColor); // Assign the same color for the center of the face
+        // Compute the normal for the triangle using cross product of edges
+        var normal = computeNormal(v0, v1, v2);
+
+        // Add normals for each vertex
+        normalsArray.push(normal);
+        normalsArray.push(normal);
+        normalsArray.push(normal);
       }
     }
+  }
+
+  // Compute normal using cross product of two edges
+  function computeNormal(v0, v1, v2) {
+    var edge1 = subtract(v1, v0);
+    var edge2 = subtract(v2, v0);
+    var normal = normalize(cross(edge1, edge2));
+    return normal;
   }
 
   function init() {
@@ -167,10 +173,18 @@ var shadedCube = function () {
 
     var nBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, nBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, flatten(normalsArray), gl.STATIC_DRAW);
+
+    var normalLoc = gl.getAttribLocation(program, "aNormal");
+    gl.vertexAttribPointer(normalLoc, 3, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(normalLoc);
+
+    var nBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, nBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, flatten(colorsArray), gl.STATIC_DRAW);
 
-    var colorLoc = gl.getAttribLocation(program, "aNormal");
-    gl.vertexAttribPointer(colorLoc, 3, gl.FLOAT, false, 0, 0);
+    var colorLoc = gl.getAttribLocation(program, "aColor");
+    gl.vertexAttribPointer(colorLoc, 4, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(colorLoc);
 
     var vBuffer = gl.createBuffer();
