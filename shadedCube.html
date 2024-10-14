@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        /* Gaya untuk menata tombol di tengah secara horizontal */
+        .controls {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        /* Gaya tambahan untuk menata form input */
+        .form-group {
+            display: flex;
+            justify-content: center;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        /* Gaya untuk membuat tombol sedikit lebih rapi */
+        button {
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="gl-canvas" width="1520" height="480"></canvas>
+
+<!-- Tombol untuk rotasi -->
+<div class="controls">
+    <button id="ButtonX">Rotate X</button>
+    <button id="ButtonY">Rotate Y</button>
+    <button id="ButtonZ">Rotate Z</button>
+    <button id="ButtonT">Toggle Rotation</button>
+</div>
+
+<!-- Input untuk percepatan -->
+<div class="form-group">
+    <label for="accelerationX">Acceleration X:</label>
+    <input type="number" id="accelerationX" value="0" step="0.1">
+</div>
+<div class="form-group">
+    <label for="accelerationY">Acceleration Y:</label>
+    <input type="number" id="accelerationY" value="0" step="0.1">
+</div>
+<div class="form-group">
+    <label for="accelerationZ">Acceleration Z:</label>
+    <input type="number" id="accelerationZ" value="0" step="0.1">
+</div>
+
+<!-- Input untuk kecepatan awal -->
+<div class="form-group">
+    <label for="velocityX">Initial Velocity X:</label>
+    <input type="number" id="velocityX" value="0" step="0.1">
+</div>
+<div class="form-group">
+    <label for="velocityY">Initial Velocity Y:</label>
+    <input type="number" id="velocityY" value="0" step="0.1">
+</div>
+<div class="form-group">
+    <label for="velocityZ">Initial Velocity Z:</label>
+    <input type="number" id="velocityZ" value="0" step="0.1">
+</div>
+
+<!-- Input untuk massa -->
+<div class="form-group">
+    <label for="mass">Mass:</label>
+    <input type="number" id="mass" value="1" step="0.1">
+</div>
+
+<!-- Input untuk gravitasi -->
+<div class="form-group">
+    <label for="gravity">Gravity (Y-axis):</label>
+    <input type="number" id="gravity" value="-9.8" step="0.1">
+</div>
+
+
+
+<!-- Input untuk mengatur warna cahaya -->
+<div class="form-group">
+    <label for="ambientColor">Ambient Light Color:</label>
+    <input type="color" id="ambientColor" value="#808080">
+</div>
+
+<div class="form-group">
+    <label for="diffuseColor">Diffuse Light Color:</label>
+    <input type="color" id="diffuseColor" value="#FFFFFF">
+</div>
+
+<div class="form-group">
+    <label for="specularColor">Specular Light Color:</label>
+    <input type="color" id="specularColor" value="#FFFFFF">
+</div>
+
+<!-- Slider untuk mengatur posisi cahaya -->
+<div class="form-group">
+    <label for="lightX">Light Position X:</label>
+    <input type="range" id="lightX" min="-10" max="10" value="1" step="0.1">
+</div>
+
+<div class="form-group">
+    <label for="lightY">Light Position Y:</label>
+    <input type="range" id="lightY" min="-10" max="10" value="1" step="0.1">
+</div>
+
+<div class="form-group">
+    <label for="lightZ">Light Position Z:</label>
+    <input type="range" id="lightZ" min="-10" max="10" value="1" step="0.1">
+</div>
+
+<!-- Input untuk mengatur warna material -->
+<div class="form-group">
+    <label for="materialAmbient">Material Ambient Color:</label>
+    <input type="color" id="materialAmbient" value="#FF00FF">
+</div>
+
+<div class="form-group">
+    <label for="materialDiffuse">Material Diffuse Color:</label>
+    <input type="color" id="materialDiffuse" value="#FFA500">
+</div>
+
+<div class="form-group">
+    <label for="materialSpecular">Material Specular Color:</label>
+    <input type="color" id="materialSpecular" value="#FFA500">
+</div>
+
+<script id="vertex-shader" type="x-shader/x-vertex">
+    #version 300 es
+
+    in vec4 aPosition;
+    in vec3 aNormal;
+
+    out vec3 vNormal;   // Normal untuk pencahayaan
+    out vec3 vPosition; // Posisi vertex di ruang mata
+
+    uniform mat4 uModelViewMatrix;
+    uniform mat4 uProjectionMatrix;
+
+    void main() {
+        vPosition = vec3(uModelViewMatrix * aPosition);  // Hitung posisi di ruang mata
+        vNormal = mat3(uModelViewMatrix) * aNormal;      // Transformasi normal ke ruang mata
+        gl_Position = uProjectionMatrix * uModelViewMatrix * aPosition;  // Posisi akhir vertex
+    }    
+</script>
+
+<script id="fragment-shader" type="x-shader/x-fragment">
+    #version 300 es
+    precision mediump float;
+
+    in vec3 vNormal;
+    in vec3 vPosition;
+
+    uniform vec4 uAmbientProduct, uDiffuseProduct, uSpecularProduct;
+    uniform vec4 uLightPosition;
+    uniform float uShininess;
+
+    out vec4 fColor;
+
+    void main() {
+        vec3 N = normalize(vNormal);  // Normal yang sudah ditransformasikan
+        vec3 L = normalize(uLightPosition.xyz - vPosition);  // Arah cahaya
+        vec3 E = normalize(-vPosition);  // Arah kamera
+        vec3 H = normalize(L + E);  // Vektor setengah untuk specular highlight
+
+        // Pencahayaan Ambient
+        vec4 ambient = uAmbientProduct;
+
+        // Pencahayaan Diffuse
+        float Kd = max(dot(L, N), 0.0);
+        vec4 diffuse = Kd * uDiffuseProduct;
+
+        // Pencahayaan Specular
+        float Ks = pow(max(dot(N, H), 0.0), uShininess);
+        vec4 specular = Ks * uSpecularProduct;
+
+        // Gabungkan semua komponen pencahayaan
+        fColor = ambient + diffuse + specular;
+        fColor.a = 1.0;
+    }
+</script>
+
+<script src="initShaders.js"></script>
+<script src="MVnew.js"></script>
+<script src="shadedCube.js"></script>
+
+</body>
+</html>
