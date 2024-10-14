@@ -43,6 +43,9 @@ var shadedCube = function () {
   var gravity = vec3(0.0, -9.8, 0.0);
   var restitution = 0.8;
 
+  // Variabel untuk mencatat nilai maksimum posisi X, Y, dan Z
+  var maxPosition = vec3(-Infinity, -Infinity, -Infinity);
+
   init();
 
   function quad(a, b, c, d) {
@@ -126,24 +129,18 @@ var shadedCube = function () {
     };
 
     // Input untuk percepatan
-    document.getElementById("applyAccelerationX").addEventListener("click", function () {
+    document.getElementById("applyAcceleration").addEventListener("click", function () {
       acceleration[0] = parseFloat(document.getElementById("accelerationX").value);
-    });
-    document.getElementById("applyAccelerationY").addEventListener("click", function () {
       acceleration[1] = parseFloat(document.getElementById("accelerationY").value);
-    });
-    document.getElementById("applyAccelerationZ").addEventListener("click", function () {
       acceleration[2] = parseFloat(document.getElementById("accelerationZ").value);
+      console.log("Applied Acceleration: ", acceleration);
     });
 
-    document.getElementById("applyVelocityX").addEventListener("click", function () {
+    document.getElementById("applyVelocity").addEventListener("click", function () {
       velocity[0] = parseFloat(document.getElementById("velocityX").value);
-    });
-    document.getElementById("applyVelocityY").addEventListener("click", function () {
       velocity[1] = parseFloat(document.getElementById("velocityY").value);
-    });
-    document.getElementById("applyVelocityZ").addEventListener("click", function () {
       velocity[2] = parseFloat(document.getElementById("velocityZ").value);
+      console.log("Applied Velocity: ", velocity);
     });
 
     // Input untuk massa
@@ -172,6 +169,10 @@ var shadedCube = function () {
       mass = 1.0;
       gravity = vec3(0.0, -9.8, 0.0);
       position = vec3(-0.8, -0.5, -1.0);
+
+      // Reset nilai maksimum posisi
+      maxPosition = vec3(-Infinity, -Infinity, -Infinity);
+      document.getElementById("maxPositionCounter").textContent = `Max Position: X=${maxPosition[0]}, Y=${maxPosition[1]}, Z=${maxPosition[2]}`;
     });
 
     updateLightColors();
@@ -250,6 +251,17 @@ var shadedCube = function () {
       position[1] = -1.0;
       velocity[1] = -velocity[1] * restitution; // Pantulan dengan koefisien restitusi
     }
+
+    // Periksa dan catat nilai maksimum dari posisi X, Y, Z
+    if (position[0] > maxPosition[0]) maxPosition[0] = position[0];
+    if (position[1] > maxPosition[1]) maxPosition[1] = position[1];
+    if (position[2] > maxPosition[2]) maxPosition[2] = position[2];
+
+    // Update counter untuk menampilkan posisi kubus
+    document.getElementById("positionCounter").textContent = `Position: X=${position[0].toFixed(2)}, Y=${position[1].toFixed(2)}, Z=${position[2].toFixed(2)}`;
+
+    // Update max counter untuk menampilkan nilai maksimum X, Y, Z
+    document.getElementById("maxPositionCounter").textContent = `Max Position: X=${maxPosition[0].toFixed(2)}, Y=${maxPosition[1].toFixed(2)}, Z=${maxPosition[2].toFixed(2)}`;
 
     modelViewMatrix = mat4();
     modelViewMatrix = mult(modelViewMatrix, translate(position[0], position[1], position[2]));
