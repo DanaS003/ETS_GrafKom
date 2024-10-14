@@ -4,8 +4,6 @@ var shadedCube = function () {
   var canvas;
   var gl;
 
-  var numPositions = 36;
-
   var positionsArray = [];
   var normalsArray = [];
   var colorsArray = [];
@@ -168,7 +166,6 @@ var shadedCube = function () {
     program = initShaders(gl, "vertex-shader", "fragment-shader");
     gl.useProgram(program);
 
-    // colorCube();
     Dodecahedron();
 
     var nBuffer = gl.createBuffer();
@@ -179,8 +176,8 @@ var shadedCube = function () {
     gl.vertexAttribPointer(normalLoc, 3, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(normalLoc);
 
-    var nBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, nBuffer);
+    var cBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, flatten(colorsArray), gl.STATIC_DRAW);
 
     var colorLoc = gl.getAttribLocation(program, "aColor");
