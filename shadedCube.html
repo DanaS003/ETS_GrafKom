@@ -4,10 +4,27 @@
     <style>
       /* Gaya untuk menata tombol di tengah secara horizontal */
       .controls {
-        display: flex;
-        justify-content: center;
+        display: grid;
+        grid-template-columns: repeat(8, 1fr);
+        grid-gap: 10px;
+        justify-items: left;
         margin-bottom: 20px;
-        flex-wrap: wrap;
+        margin-left: 20px;
+        margin-right: 20px;
+      }
+
+      /* Style for the mode display in the top left corner */
+      .mode-display {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background-color: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 10px;
+        border-radius: 5px;
+        font-family: Arial, sans-serif;
+        font-size: 16px;
+        z-index: 10;
       }
 
       /* Gaya tambahan untuk menata form input */
@@ -16,38 +33,51 @@
         justify-content: center;
         flex-direction: column;
         align-items: center;
-        margin-bottom: 10px;
+        margin-bottom: 20px;
       }
 
       /* Gaya untuk menata input dalam satu baris (jejer ke samping) */
       .form-group-3 {
         display: flex;
         justify-content: space-between;
-        width: 400px; /* Lebar untuk menata input secara horizontal */
+        width: 100%;
+        max-width: 200px;
       }
 
-      /* Memperbesar ukuran tombol */
+      /* Memperbesar ukuran tombol dan menambah tampilan yang lebih baik */
       button {
         margin: 5px;
-        padding: 10px 20px; /* Memperbesar padding tombol */
-        font-size: 16px; /* Memperbesar ukuran font */
-        width: 150px; /* Memperbesar lebar tombol */
+        padding: 12px 20px;
+        font-size: 14px; /* Memperkecil sedikit ukuran tombol agar muat dalam grid */
+        width: 150px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+
+      /* Efek hover untuk tombol */
+      button:hover {
+        background-color: #0056b3;
       }
 
       input {
-        width: 30%; /* Lebar input agar terlihat seragam dalam satu baris */
+        width: 40%; /* Lebar input agar terlihat seragam dalam satu baris */
       }
 
       /* Counter untuk posisi kubus di pojok kanan atas, geser sedikit dari tombol Reset */
       .counter {
         position: absolute;
         top: 10px;
-        right: 170px; /* Geser agar tidak bertumpuk dengan tombol Reset */
-        background-color: rgba(0, 0, 0, 0.7); /* Background hitam transparan */
+        right: 170px;
+        background-color: rgba(0, 0, 0, 0.7);
         color: white;
         padding: 10px;
         border-radius: 5px;
         font-family: Arial, sans-serif;
+        z-index: 10;
       }
 
       /* Tombol Reset di pojok kanan atas */
@@ -55,25 +85,27 @@
         position: absolute;
         top: 10px;
         right: 10px;
-        background-color: red; /* Warna background untuk tombol reset */
+        background-color: red;
         color: white;
         border: none;
         padding: 10px 20px;
         border-radius: 5px;
         font-size: 16px;
         cursor: pointer;
+        z-index: 10;
       }
 
       /* Gaya untuk nilai maksimum posisi kubus di pojok kanan bawah */
       .max-counter {
         position: absolute;
-        bottom: 10px;
-        right: 10px;
+        top: 10px;
+        right: 450px;
         background-color: rgba(0, 0, 0, 0.7);
         color: white;
         padding: 10px;
         border-radius: 5px;
         font-family: Arial, sans-serif;
+        z-index: 10;
       }
     </style>
   </head>
@@ -91,48 +123,80 @@
 
     <!-- Tombol untuk rotasi -->
     <div class="controls">
+    <div>
+      <label for="Rotate">Rotate:</label>
       <button id="ButtonX">Rotate X</button>
       <button id="ButtonY">Rotate Y</button>
       <button id="ButtonZ">Rotate Z</button>
       <button id="ButtonT">Toggle Rotation</button>
     </div>
 
+    <!-- Add buttons for Bouncing and Through modes -->
+  <div>
+    <label for="Mode">Mode:</label>
+      <button id="bouncingMode">Bouncing Mode</button>
+      <button id="throughMode">Through Mode</button>
+  </div>
+
+    <!-- Mode display in the top left corner -->
+    <div class="mode-display" id="modeDisplay">Mode: Bouncing</div>
+
+    <div>
     <!-- Input untuk percepatan (acceleration) -->
     <div class="form-group">
-      <label for="accelerationX">Acceleration X, Y, Z:</label>
+      <label for="accelerationX">Acceleration X, Y:</label>
       <div class="form-group-3">
         <input type="number" id="accelerationX" value="0" step="0.1" placeholder="Accel X" />
         <input type="number" id="accelerationY" value="0" step="0.1" placeholder="Accel Y" />
-        <input type="number" id="accelerationZ" value="0" step="0.1" placeholder="Accel Z" />
       </div>
       <button id="applyAcceleration">Enter Acceleration</button>
     </div>
+  </div>
 
+  <div>
     <!-- Input untuk kecepatan awal (velocity) -->
     <div class="form-group">
-      <label for="velocityX">Velocity X, Y, Z:</label>
+      <label for="velocityX">Velocity X, Y:</label>
       <div class="form-group-3">
         <input type="number" id="velocityX" value="0" step="0.1" placeholder="Vel X" />
         <input type="number" id="velocityY" value="0" step="0.1" placeholder="Vel Y" />
-        <input type="number" id="velocityZ" value="0" step="0.1" placeholder="Vel Z" />
       </div>
       <button id="applyVelocity">Enter Velocity</button>
     </div>
+  </div>
 
+  <div>
     <!-- Input untuk massa (mass) -->
     <div class="form-group">
       <label for="mass">Mass:</label>
       <input type="number" id="mass" value="1" step="0.1" />
       <button id="applyMass">Enter Mass</button>
     </div>
+  </div>
 
+
+  <div>
     <!-- Input untuk gravitasi (gravity) -->
     <div class="form-group">
       <label for="gravity">Gravity (Y-axis):</label>
       <input type="number" id="gravity" value="-9.8" step="0.1" />
       <button id="applyGravity">Enter Gravity</button>
     </div>
+  </div>
 
+  <div>
+    <!-- Input untuk gerak parabola (initialVelocity, elevationAngle, distanceX) -->
+    <div class="form-group">
+      <label for="initialVelocity">Parabolic Motion Parameters(V0 dan theta):</label>
+      <div class="form-group-3">
+        <input type="number" id="initialVelocity" value="0" step="0.1" placeholder="Initial Velocity (V0)" />
+        <input type="number" id="elevationAngle" value="0" step="1" placeholder="Elevation Angle (Theta)" />
+      </div>
+      <button id="applyParabola">Enter Parabolic Parameters</button>
+    </div>
+  </div>
+
+    <div>
     <!-- Input untuk Light Color (Ambient, Diffuse, Specular) secara horizontal -->
     <div class="form-group">
       <label for="ambientColor">Light Color (Ambient, Diffuse, Specular):</label>
@@ -162,6 +226,8 @@
         <input type="color" id="materialSpecular" value="#FFA500" />
       </div>
     </div>
+    </div>
+  </div>
 
     <script id="vertex-shader" type="x-shader/x-vertex">
       #version 300 es

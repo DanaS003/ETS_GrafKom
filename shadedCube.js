@@ -8,6 +8,7 @@ var shadedCube = function () {
 
   var positionsArray = [];
   var normalsArray = [];
+  var colorsArray = [];
 
   var vertices = [vec4(-0.5, -0.5, 0.5, 1.0), vec4(-0.5, 0.5, 0.5, 1.0), vec4(0.5, 0.5, 0.5, 1.0), vec4(0.5, -0.5, 0.5, 1.0), vec4(-0.5, -0.5, -0.5, 1.0), vec4(-0.5, 0.5, -0.5, 1.0), vec4(0.5, 0.5, -0.5, 1.0), vec4(0.5, -0.5, -0.5, 1.0)];
 
@@ -27,6 +28,8 @@ var shadedCube = function () {
   var viewerPos;
   var program;
 
+  var mode = "bouncing"; // Default mode is bouncing
+
   var xAxis = 0;
   var yAxis = 1;
   var zAxis = 2;
@@ -36,17 +39,114 @@ var shadedCube = function () {
   var thetaLoc;
 
   var flag = false;
-  var position = vec3(-0.8, -0.5, -1.0);
+  var position = vec3(-2.8, -0.5, -1.0);
   var velocity = vec3(0.0, 0.0, 0.0);
   var acceleration = vec3(0.0, 0.0, 0.0);
   var mass = 1.0;
   var gravity = vec3(0.0, -9.8, 0.0);
   var restitution = 0.8;
 
+    // Variabel untuk gerak parabola
+    var initialVelocity = 0.0;
+    var elevationAngle = 0.0;
+    var distanceX = 0.0;
+    var time = 2.0;
+    var parabolicMotion = false;
+
   // Variabel untuk mencatat nilai maksimum posisi X, Y, dan Z
   var maxPosition = vec3(-Infinity, -Infinity, -Infinity);
 
   init();
+
+  function Dodecahedron() {
+    // Define the vertices of a dodecahedron
+    const A = (1 + Math.sqrt(5)) / 2; // The golden ratio
+    const B = 1 / A;
+
+    var vertices = [
+      vec4(1, 1, 1, 1.0),
+      vec4(1, 1, -1, 1.0),
+      vec4(1, -1, 1, 1.0),
+      vec4(1, -1, -1, 1.0),
+      vec4(-1, 1, 1, 1.0),
+      vec4(-1, 1, -1, 1.0),
+      vec4(-1, -1, 1, 1.0),
+      vec4(-1, -1, -1, 1.0),
+      vec4(0, B, A, 1.0),
+      vec4(0, B, -A, 1.0),
+      vec4(0, -B, A, 1.0),
+      vec4(0, -B, -A, 1.0),
+      vec4(B, A, 0, 1.0),
+      vec4(B, -A, 0, 1.0),
+      vec4(-B, A, 0, 1.0),
+      vec4(-B, -A, 0, 1.0),
+      vec4(A, 0, B, 1.0),
+      vec4(A, 0, -B, 1.0),
+      vec4(-A, 0, B, 1.0),
+      vec4(-A, 0, -B, 1.0),
+    ];
+
+    // Define the faces using the vertex indices
+    var faces = [
+      [0, 16, 2, 10, 8],
+      [0, 8, 4, 14, 12],
+      [16, 17, 1, 12, 0],
+      [1, 9, 11, 3, 17],
+      [1, 12, 14, 5, 9],
+      [2, 13, 15, 6, 10],
+      [13, 3, 17, 16, 2],
+      [3, 11, 7, 15, 13],
+      [4, 8, 10, 6, 18],
+      [14, 5, 19, 18, 4],
+      [5, 19, 7, 11, 9],
+      [15, 7, 19, 18, 6],
+    ];
+
+    // Array untuk warna-warna wajah dodecahedron
+    var faceColors = [
+      vec4(1.0, 0.0, 0.0, 1.0), // Red
+      vec4(0.0, 1.0, 0.0, 1.0), // Green
+      vec4(0.0, 0.0, 1.0, 1.0), // Blue
+      vec4(1.0, 1.0, 0.0, 1.0), // Yellow
+      vec4(1.0, 0.0, 1.0, 1.0), // Magenta
+      vec4(0.0, 1.0, 1.0, 1.0), // Cyan
+      vec4(0.5, 0.5, 0.5, 1.0), // Grey
+      vec4(1.0, 0.5, 0.0, 1.0), // Orange
+      vec4(0.5, 0.0, 0.5, 1.0), // Purple
+      vec4(0.0, 0.5, 0.5, 1.0), // Teal
+      vec4(0.5, 0.5, 0.0, 1.0), // Olive
+      vec4(0.0, 0.0, 0.0, 1.0), // Black
+    ];
+
+    // Generate triangles for each face with a single color per face
+    for (var i = 0; i < faces.length; i++) {
+      var face = faces[i];
+      var faceColor = faceColors[i]; // Warna untuk satu sisi
+
+      var center = vec4(0, 0, 0, 1.0);
+      // Calculate center of each face for triangle fan rendering
+      for (var j = 0; j < face.length; j++) {
+        center[0] += vertices[face[j]][0];
+        center[1] += vertices[face[j]][1];
+        center[2] += vertices[face[j]][2];
+      }
+      center[0] /= face.length;
+      center[1] /= face.length;
+      center[2] /= face.length;
+
+      // Create triangles using triangle fan method with a single color per face
+      for (var j = 0; j < face.length; j++) {
+        positionsArray.push(vertices[face[j]]);
+        colorsArray.push(faceColor); // Assign the same color for each vertex of the face
+
+        positionsArray.push(vertices[face[(j + 1) % face.length]]);
+        colorsArray.push(faceColor); // Assign the same color for each vertex of the face
+
+        positionsArray.push(center);
+        colorsArray.push(faceColor); // Assign the same color for the center of the face
+      }
+    }
+  }
 
   function quad(a, b, c, d) {
     var t1 = subtract(vertices[b], vertices[a]);
@@ -84,22 +184,23 @@ var shadedCube = function () {
     if (!gl) alert("WebGL 2.0 isn't available");
 
     gl.viewport(0, 0, canvas.width, canvas.height);
-    gl.clearColor(1.0, 0.0, 1.0, 1.0);
+    gl.clearColor(0.0, 0.0, 0.1, 1.0);
 
     gl.enable(gl.DEPTH_TEST);
 
     program = initShaders(gl, "vertex-shader", "fragment-shader");
     gl.useProgram(program);
 
-    colorCube();
+    // colorCube();
+    Dodecahedron();
 
     var nBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, nBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, flatten(normalsArray), gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, flatten(colorsArray), gl.STATIC_DRAW);
 
-    var normalLoc = gl.getAttribLocation(program, "aNormal");
-    gl.vertexAttribPointer(normalLoc, 3, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(normalLoc);
+    var colorLoc = gl.getAttribLocation(program, "aNormal");
+    gl.vertexAttribPointer(colorLoc, 3, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(colorLoc);
 
     var vBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
@@ -113,7 +214,8 @@ var shadedCube = function () {
 
     viewerPos = vec3(0.0, 0.0, -20.0);
 
-    projectionMatrix = ortho(-1, 1, -1, 1, -100, 100);
+    var aspect = canvas.width / canvas.height;
+    projectionMatrix = ortho(-aspect, aspect, -1, 1, -100, 100);
 
     document.getElementById("ButtonX").onclick = function () {
       axis = xAxis;
@@ -127,6 +229,32 @@ var shadedCube = function () {
     document.getElementById("ButtonT").onclick = function () {
       flag = !flag;
     };
+
+    // Add event listener for Bouncing Mode
+    document.getElementById("bouncingMode").addEventListener("click", function () {
+      mode = "bouncing";
+      console.log("Switched to Bouncing Mode");
+    });
+
+    // Add event listener for Through Mode
+    document.getElementById("throughMode").addEventListener("click", function () {
+      mode = "through";
+      console.log("Switched to Through Mode");
+    });
+
+    // Add event listener for Bouncing Mode
+    document.getElementById("bouncingMode").addEventListener("click", function () {
+      mode = "bouncing";
+      document.getElementById("modeDisplay").textContent = "Mode: Bouncing"; // Update the mode display
+      console.log("Switched to Bouncing Mode");
+    });
+
+    // Add event listener for Through Mode
+    document.getElementById("throughMode").addEventListener("click", function () {
+      mode = "through";
+      document.getElementById("modeDisplay").textContent = "Mode: Through"; // Update the mode display
+      console.log("Switched to Through Mode");
+    });
 
     // Input untuk percepatan
     document.getElementById("applyAcceleration").addEventListener("click", function () {
@@ -143,6 +271,13 @@ var shadedCube = function () {
       console.log("Applied Velocity: ", velocity);
     });
 
+    document.getElementById("applyParabola").addEventListener("click", function () {
+      initialVelocity = parseFloat(document.getElementById("initialVelocity").value);
+      elevationAngle = parseFloat(document.getElementById("elevationAngle").value) * (Math.PI / 180);
+      time = 0.0;
+      parabolicMotion = true;
+    });
+
     // Input untuk massa
     document.getElementById("applyMass").addEventListener("click", function () {
       mass = parseFloat(document.getElementById("mass").value);
@@ -157,10 +292,8 @@ var shadedCube = function () {
     document.getElementById("resetValues").addEventListener("click", function () {
       document.getElementById("accelerationX").value = 0;
       document.getElementById("accelerationY").value = 0;
-      document.getElementById("accelerationZ").value = 0;
       document.getElementById("velocityX").value = 0;
       document.getElementById("velocityY").value = 0;
-      document.getElementById("velocityZ").value = 0;
       document.getElementById("mass").value = 1;
       document.getElementById("gravity").value = -9.8;
 
@@ -168,7 +301,12 @@ var shadedCube = function () {
       velocity = vec3(0.0, 0.0, 0.0);
       mass = 1.0;
       gravity = vec3(0.0, -9.8, 0.0);
-      position = vec3(-0.8, -0.5, -1.0);
+      position = vec3(-2.8, -0.5, -1.0);
+      initialVelocity = 0.0;
+      elevationAngle = 0.0;
+      distanceX = 0.0;
+      time = 0.0;
+      parabolicMotion = false;
 
       // Reset nilai maksimum posisi
       maxPosition = vec3(-Infinity, -Infinity, -Infinity);
@@ -240,16 +378,73 @@ var shadedCube = function () {
 
     if (flag) theta[axis] += 2.0;
 
-    // Update fisika: kecepatan dan posisi
-    var gravityEffect = scale(1.0 / mass, gravity); // Efek gravitasi tergantung pada massa
-    var totalAcceleration = add(acceleration, gravityEffect); // Total percepatan = percepatan + gravitasi
+
+    // Parabolic motion
+    if (parabolicMotion) {
+      
+      time += 0.01;
+  
+      // Update position using parabolic motion equations
+      position[0] = position[0] + initialVelocity * Math.cos(elevationAngle) * time;
+      position[1] = position[1] + (initialVelocity * Math.sin(elevationAngle) * time + 0.5 * gravity[1] * time * time);
+      
+      if (position[1] - 0.1 <= -1.0){
+        parabolicMotion=false;
+      }
+
+    } else {
+    // Update physics: velocity and position
+    var gravityEffect = scale(1.0 / mass, gravity); // Effect of gravity based on mass
+    var totalAcceleration = add(acceleration, gravityEffect); // Total acceleration = acceleration + gravity
     velocity = add(velocity, scale(0.01, totalAcceleration)); // velocity = velocity + totalAcceleration * deltaTime
     position = add(position, scale(0.01, velocity)); // position = position + velocity * deltaTime
+    }
 
-    // Deteksi tabrakan dengan lantai (y = -1.0) dan pemantulan
-    if (position[1] <= -1.0) {
-      position[1] = -1.0;
-      velocity[1] = -velocity[1] * restitution; // Pantulan dengan koefisien restitusi
+    var cubeHalfSize = 0.1;
+
+    // Apply collision detection only in Bouncing Mode
+    if (mode === "bouncing") {
+      // Floor collision (y = -1.0) with bounce
+      if (position[1] - cubeHalfSize <= -1.0) {
+        position[1] = -1.0 + cubeHalfSize;
+        velocity[1] = -velocity[1] * restitution;
+      }
+
+      // Ceiling collision
+      if (position[1] + cubeHalfSize >= 1.0) {
+        position[1] = 1.0 - cubeHalfSize;
+        velocity[1] = -velocity[1] * restitution;
+      }
+
+      // Left wall collision
+      if (position[0] - cubeHalfSize <= -3.05) {
+        position[0] = -3.05 + cubeHalfSize;
+        velocity[0] = -velocity[0] * restitution;
+      }
+
+      // Right wall collision
+      if (position[0] + cubeHalfSize >= 3.05) {
+        position[0] = 3.05 - cubeHalfSize;
+        velocity[0] = -velocity[0] * restitution;
+      }
+
+      // Front and back wall collisions (optional if you have 3D depth)
+      if (position[2] - cubeHalfSize <= -3.05) {
+        position[2] = -3.05 + cubeHalfSize;
+        velocity[2] = -velocity[2] * restitution;
+      }
+      if (position[2] + cubeHalfSize >= 3.05) {
+        position[2] = 3.05 - cubeHalfSize;
+        velocity[2] = -velocity[2] * restitution;
+      }
+    } else if (mode === "through") {
+      // In Through Mode, only bottom boundary has a limit (gravity still acts)
+      if (position[1] - cubeHalfSize <= -1.0) {
+        position[1] = -1.0 + cubeHalfSize;
+        velocity[1] = -velocity[1] * restitution;
+      }
+
+      // No collision detection for other walls
     }
 
     // Periksa dan catat nilai maksimum dari posisi X, Y, Z
@@ -263,16 +458,17 @@ var shadedCube = function () {
     // Update max counter untuk menampilkan nilai maksimum X, Y, Z
     document.getElementById("maxPositionCounter").textContent = `Max Position: X=${maxPosition[0].toFixed(2)}, Y=${maxPosition[1].toFixed(2)}, Z=${maxPosition[2].toFixed(2)}`;
 
+    // Update and render the model view matrix
     modelViewMatrix = mat4();
     modelViewMatrix = mult(modelViewMatrix, translate(position[0], position[1], position[2]));
-    modelViewMatrix = mult(modelViewMatrix, scale(0.04, 0.1, 0.1));
+    modelViewMatrix = mult(modelViewMatrix, scale(0.07, 0.07, 0.07));
     modelViewMatrix = mult(modelViewMatrix, rotate(theta[xAxis], vec3(1, 0, 0)));
     modelViewMatrix = mult(modelViewMatrix, rotate(theta[yAxis], vec3(0, 1, 0)));
     modelViewMatrix = mult(modelViewMatrix, rotate(theta[zAxis], vec3(0, 0, 1)));
 
     gl.uniformMatrix4fv(gl.getUniformLocation(program, "uModelViewMatrix"), false, flatten(modelViewMatrix));
 
-    gl.drawArrays(gl.TRIANGLES, 0, numPositions);
+    gl.drawArrays(gl.TRIANGLES, 0, colorsArray.length);
 
     requestAnimationFrame(render);
   }
