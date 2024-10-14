@@ -46,12 +46,12 @@ var shadedCube = function () {
   var gravity = vec3(0.0, -9.8, 0.0);
   var restitution = 0.8;
 
-    // Variabel untuk gerak parabola
-    var initialVelocity = 0.0;
-    var elevationAngle = 0.0;
-    var distanceX = 0.0;
-    var time = 2.0;
-    var parabolicMotion = false;
+  // Variabel untuk gerak parabola
+  var initialVelocity = 0.0;
+  var elevationAngle = 0.0;
+  var distanceX = 0.0;
+  var time = 2.0;
+  var parabolicMotion = false;
 
   // Variabel untuk mencatat nilai maksimum posisi X, Y, dan Z
   var maxPosition = vec3(-Infinity, -Infinity, -Infinity);
@@ -146,35 +146,6 @@ var shadedCube = function () {
         colorsArray.push(faceColor); // Assign the same color for the center of the face
       }
     }
-  }
-
-  function quad(a, b, c, d) {
-    var t1 = subtract(vertices[b], vertices[a]);
-    var t2 = subtract(vertices[c], vertices[b]);
-    var normal = cross(t1, t2);
-    normal = vec3(normal);
-
-    positionsArray.push(vertices[a]);
-    normalsArray.push(normal);
-    positionsArray.push(vertices[b]);
-    normalsArray.push(normal);
-    positionsArray.push(vertices[c]);
-    normalsArray.push(normal);
-    positionsArray.push(vertices[a]);
-    normalsArray.push(normal);
-    positionsArray.push(vertices[c]);
-    normalsArray.push(normal);
-    positionsArray.push(vertices[d]);
-    normalsArray.push(normal);
-  }
-
-  function colorCube() {
-    quad(1, 0, 3, 2);
-    quad(2, 3, 7, 6);
-    quad(3, 0, 4, 7);
-    quad(6, 5, 1, 2);
-    quad(4, 5, 6, 7);
-    quad(5, 4, 0, 1);
   }
 
   function init() {
@@ -381,23 +352,23 @@ var shadedCube = function () {
 
     // Parabolic motion
     if (parabolicMotion) {
-      
+
       time += 0.01;
-  
+
       // Update position using parabolic motion equations
       position[0] = position[0] + initialVelocity * Math.cos(elevationAngle) * time;
       position[1] = position[1] + (initialVelocity * Math.sin(elevationAngle) * time + 0.5 * gravity[1] * time * time);
-      
-      if (position[1] - 0.1 <= -1.0){
-        parabolicMotion=false;
+
+      if (position[1] - 0.1 <= -1.0) {
+        parabolicMotion = false;
       }
 
     } else {
-    // Update physics: velocity and position
-    var gravityEffect = scale(1.0 / mass, gravity); // Effect of gravity based on mass
-    var totalAcceleration = add(acceleration, gravityEffect); // Total acceleration = acceleration + gravity
-    velocity = add(velocity, scale(0.01, totalAcceleration)); // velocity = velocity + totalAcceleration * deltaTime
-    position = add(position, scale(0.01, velocity)); // position = position + velocity * deltaTime
+      // Update physics: velocity and position
+      var gravityEffect = scale(1.0 / mass, gravity); // Effect of gravity based on mass
+      var totalAcceleration = add(acceleration, gravityEffect); // Total acceleration = acceleration + gravity
+      velocity = add(velocity, scale(0.01, totalAcceleration)); // velocity = velocity + totalAcceleration * deltaTime
+      position = add(position, scale(0.01, velocity)); // position = position + velocity * deltaTime
     }
 
     var cubeHalfSize = 0.1;
