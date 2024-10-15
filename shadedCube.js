@@ -253,6 +253,19 @@ var shadedCube = function () {
       console.log("Applied Velocity: ", velocity);
     });
 
+    // Input untuk Acceleration dan Velocity bersama-sama
+    document.getElementById("applyBoth").addEventListener("click", function () {
+      // Ambil nilai acceleration
+      acceleration[0] = parseFloat(document.getElementById("accelerationX").value);
+      acceleration[1] = parseFloat(document.getElementById("accelerationY").value);
+
+      // Ambil nilai velocity
+      velocity[0] = parseFloat(document.getElementById("velocityX").value);
+      velocity[1] = parseFloat(document.getElementById("velocityY").value);
+
+      console.log("Applied Both Acceleration and Velocity: ", acceleration, velocity);
+    });
+
     document.getElementById("applyParabola").addEventListener("click", function () {
       initialVelocity = parseFloat(document.getElementById("initialVelocity").value);
       elevationAngle = parseFloat(document.getElementById("elevationAngle").value) * (Math.PI / 180);
@@ -360,10 +373,8 @@ var shadedCube = function () {
 
     if (flag) theta[axis] += 2.0;
 
-
     // Parabolic motion
     if (parabolicMotion) {
-
       time += 0.01;
 
       // Update position using parabolic motion equations
@@ -373,7 +384,6 @@ var shadedCube = function () {
       if (position[1] - 0.1 <= -1.0) {
         parabolicMotion = false;
       }
-
     } else {
       // Update physics: velocity and position
       var gravityEffect = scale(1.0 / mass, gravity); // Effect of gravity based on mass

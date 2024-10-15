@@ -123,111 +123,117 @@
 
     <!-- Tombol untuk rotasi -->
     <div class="controls">
-    <div>
-      <label for="Rotate">Rotate:</label>
-      <button id="ButtonX">Rotate X</button>
-      <button id="ButtonY">Rotate Y</button>
-      <button id="ButtonZ">Rotate Z</button>
-      <button id="ButtonT">Toggle Rotation</button>
-    </div>
-
-    <!-- Add buttons for Bouncing and Through modes -->
-  <div>
-    <label for="Mode">Mode:</label>
-      <button id="bouncingMode">Bouncing Mode</button>
-      <button id="throughMode">Through Mode</button>
-  </div>
-
-    <!-- Mode display in the top left corner -->
-    <div class="mode-display" id="modeDisplay">Mode: Bouncing</div>
-
-    <div>
-    <!-- Input untuk percepatan (acceleration) -->
-    <div class="form-group">
-      <label for="accelerationX">Acceleration X, Y:</label>
-      <div class="form-group-3">
-        <input type="number" id="accelerationX" value="0" step="0.1" placeholder="Accel X" />
-        <input type="number" id="accelerationY" value="0" step="0.1" placeholder="Accel Y" />
+      <div>
+        <label for="Rotate">Rotate:</label>
+        <button id="ButtonX">Rotate X</button>
+        <button id="ButtonY">Rotate Y</button>
+        <button id="ButtonZ">Rotate Z</button>
+        <button id="ButtonT">Toggle Rotation</button>
       </div>
-      <button id="applyAcceleration">Enter Acceleration</button>
-    </div>
-  </div>
 
-  <div>
-    <!-- Input untuk kecepatan awal (velocity) -->
-    <div class="form-group">
-      <label for="velocityX">Velocity X, Y:</label>
-      <div class="form-group-3">
-        <input type="number" id="velocityX" value="0" step="0.1" placeholder="Vel X" />
-        <input type="number" id="velocityY" value="0" step="0.1" placeholder="Vel Y" />
+      <!-- Add buttons for Bouncing and Through modes -->
+      <div>
+        <label for="Mode">Mode:</label>
+        <button id="bouncingMode">Bouncing Mode</button>
+        <button id="throughMode">Through Mode</button>
       </div>
-      <button id="applyVelocity">Enter Velocity</button>
-    </div>
-  </div>
 
-  <div>
-    <!-- Input untuk massa (mass) -->
-    <div class="form-group">
-      <label for="mass">Mass:</label>
-      <input type="number" id="mass" value="1" step="0.1" />
-      <button id="applyMass">Enter Mass</button>
-    </div>
-  </div>
+      <!-- Mode display in the top left corner -->
+      <div class="mode-display" id="modeDisplay">Mode: Bouncing</div>
 
-
-  <div>
-    <!-- Input untuk gravitasi (gravity) -->
-    <div class="form-group">
-      <label for="gravity">Gravity (Y-axis):</label>
-      <input type="number" id="gravity" value="-9.8" step="0.1" />
-      <button id="applyGravity">Enter Gravity</button>
-    </div>
-  </div>
-
-  <div>
-    <!-- Input untuk gerak parabola (initialVelocity, elevationAngle, distanceX) -->
-    <div class="form-group">
-      <label for="initialVelocity">Parabolic Motion Parameters(V0 dan theta):</label>
-      <div class="form-group-3">
-        <input type="number" id="initialVelocity" value="0" step="0.1" placeholder="Initial Velocity (V0)" />
-        <input type="number" id="elevationAngle" value="0" step="1" placeholder="Elevation Angle (Theta)" />
+      <div>
+        <!-- Input untuk percepatan (acceleration) -->
+        <div class="form-group">
+          <label for="accelerationX">Acceleration X, Y:</label>
+          <div class="form-group-3">
+            <input type="number" id="accelerationX" value="0" step="0.1" placeholder="Accel X" />
+            <input type="number" id="accelerationY" value="0" step="0.1" placeholder="Accel Y" />
+          </div>
+          <button id="applyAcceleration">Enter Acceleration</button>
+        </div>
       </div>
-      <button id="applyParabola">Enter Parabolic Parameters</button>
-    </div>
-  </div>
 
-    <div>
-    <!-- Input untuk Light Color (Ambient, Diffuse, Specular) secara horizontal -->
-    <div class="form-group">
-      <label for="ambientColor">Light Color (Ambient, Diffuse, Specular):</label>
-      <div class="form-group-3">
-        <input type="color" id="ambientColor" value="#808080" />
-        <input type="color" id="diffuseColor" value="#FFFFFF" />
-        <input type="color" id="specularColor" value="#FFFFFF" />
+      <div>
+        <!-- Input untuk kecepatan awal (velocity) -->
+        <div class="form-group">
+          <label for="velocityX">Velocity X, Y:</label>
+          <div class="form-group-3">
+            <input type="number" id="velocityX" value="0" step="0.1" placeholder="Vel X" />
+            <input type="number" id="velocityY" value="0" step="0.1" placeholder="Vel Y" />
+          </div>
+          <button id="applyVelocity">Enter Velocity</button>
+        </div>
+      </div>
+
+      <div>
+        <!-- Input untuk Acceleration dan Velocity bersama-sama -->
+        <div class="form-group">
+          <button id="applyBoth">Enter Both Acceleration & Velocity</button>
+        </div>
+      </div>
+
+      <div>
+        <!-- Input untuk massa (mass) -->
+        <div class="form-group">
+          <label for="mass">Mass:</label>
+          <input type="number" id="mass" value="1" step="0.1" />
+          <button id="applyMass">Enter Mass</button>
+        </div>
+      </div>
+
+      <div>
+        <!-- Input untuk gravitasi (gravity) -->
+        <div class="form-group">
+          <label for="gravity">Gravity (Y-axis):</label>
+          <input type="number" id="gravity" value="-9.8" step="0.1" />
+          <button id="applyGravity">Enter Gravity</button>
+        </div>
+      </div>
+
+      <div>
+        <!-- Input untuk gerak parabola (initialVelocity, elevationAngle, distanceX) -->
+        <div class="form-group">
+          <label for="initialVelocity">Parabolic Motion Parameters(V0 dan theta):</label>
+          <div class="form-group-3">
+            <input type="number" id="initialVelocity" value="0" step="0.1" placeholder="Initial Velocity (V0)" />
+            <input type="number" id="elevationAngle" value="0" step="1" placeholder="Elevation Angle (Theta)" />
+          </div>
+          <button id="applyParabola">Enter Parabolic Parameters</button>
+        </div>
+      </div>
+
+      <div>
+        <!-- Input untuk Light Color (Ambient, Diffuse, Specular) secara horizontal -->
+        <div class="form-group">
+          <label for="ambientColor">Light Color (Ambient, Diffuse, Specular):</label>
+          <div class="form-group-3">
+            <input type="color" id="ambientColor" value="#808080" />
+            <input type="color" id="diffuseColor" value="#FFFFFF" />
+            <input type="color" id="specularColor" value="#FFFFFF" />
+          </div>
+        </div>
+
+        <!-- Input untuk Light Position (X, Y, Z) secara horizontal -->
+        <div class="form-group">
+          <label for="lightX">Light Position X, Y, Z:</label>
+          <div class="form-group-3">
+            <input type="range" id="lightX" min="-10" max="10" value="1" step="0.1" />
+            <input type="range" id="lightY" min="-10" max="10" value="1" step="0.1" />
+            <input type="range" id="lightZ" min="-10" max="10" value="1" step="0.1" />
+          </div>
+        </div>
+
+        <!-- Input untuk Material Color (Ambient, Diffuse, Specular) secara horizontal -->
+        <div class="form-group">
+          <label for="materialAmbient">Material Color (Ambient, Diffuse, Specular):</label>
+          <div class="form-group-3">
+            <input type="color" id="materialAmbient" value="#FF00FF" />
+            <input type="color" id="materialDiffuse" value="#FFA500" />
+            <input type="color" id="materialSpecular" value="#FFA500" />
+          </div>
+        </div>
       </div>
     </div>
-
-    <!-- Input untuk Light Position (X, Y, Z) secara horizontal -->
-    <div class="form-group">
-      <label for="lightX">Light Position X, Y, Z:</label>
-      <div class="form-group-3">
-        <input type="range" id="lightX" min="-10" max="10" value="1" step="0.1" />
-        <input type="range" id="lightY" min="-10" max="10" value="1" step="0.1" />
-        <input type="range" id="lightZ" min="-10" max="10" value="1" step="0.1" />
-      </div>
-    </div>
-
-    <!-- Input untuk Material Color (Ambient, Diffuse, Specular) secara horizontal -->
-    <div class="form-group">
-      <label for="materialAmbient">Material Color (Ambient, Diffuse, Specular):</label>
-      <div class="form-group-3">
-        <input type="color" id="materialAmbient" value="#FF00FF" />
-        <input type="color" id="materialDiffuse" value="#FFA500" />
-        <input type="color" id="materialSpecular" value="#FFA500" />
-      </div>
-    </div>
-    </div>
-  </div>
 
     <script id="vertex-shader" type="x-shader/x-vertex">
       #version 300 es
