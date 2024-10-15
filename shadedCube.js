@@ -215,18 +215,6 @@ var shadedCube = function () {
     // Add event listener for Bouncing Mode
     document.getElementById("bouncingMode").addEventListener("click", function () {
       mode = "bouncing";
-      console.log("Switched to Bouncing Mode");
-    });
-
-    // Add event listener for Through Mode
-    document.getElementById("throughMode").addEventListener("click", function () {
-      mode = "through";
-      console.log("Switched to Through Mode");
-    });
-
-    // Add event listener for Bouncing Mode
-    document.getElementById("bouncingMode").addEventListener("click", function () {
-      mode = "bouncing";
       document.getElementById("modeDisplay").textContent = "Mode: Bouncing"; // Update the mode display
       console.log("Switched to Bouncing Mode");
     });
@@ -242,14 +230,12 @@ var shadedCube = function () {
     document.getElementById("applyAcceleration").addEventListener("click", function () {
       acceleration[0] = parseFloat(document.getElementById("accelerationX").value);
       acceleration[1] = parseFloat(document.getElementById("accelerationY").value);
-      acceleration[2] = parseFloat(document.getElementById("accelerationZ").value);
       console.log("Applied Acceleration: ", acceleration);
     });
 
     document.getElementById("applyVelocity").addEventListener("click", function () {
       velocity[0] = parseFloat(document.getElementById("velocityX").value);
       velocity[1] = parseFloat(document.getElementById("velocityY").value);
-      velocity[2] = parseFloat(document.getElementById("velocityZ").value);
       console.log("Applied Velocity: ", velocity);
     });
 
@@ -302,6 +288,7 @@ var shadedCube = function () {
       distanceX = 0.0;
       time = 0.0;
       parabolicMotion = false;
+      flag = !flag;
 
       // Reset nilai maksimum posisi
       maxPosition = vec3(-Infinity, -Infinity, -Infinity);
