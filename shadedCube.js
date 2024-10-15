@@ -239,13 +239,10 @@ var shadedCube = function () {
       console.log("Applied Velocity: ", velocity);
     });
 
-    // Input untuk Acceleration dan Velocity bersama-sama
     document.getElementById("applyBoth").addEventListener("click", function () {
-      // Ambil nilai acceleration
       acceleration[0] = parseFloat(document.getElementById("accelerationX").value);
       acceleration[1] = parseFloat(document.getElementById("accelerationY").value);
 
-      // Ambil nilai velocity
       velocity[0] = parseFloat(document.getElementById("velocityX").value);
       velocity[1] = parseFloat(document.getElementById("velocityY").value);
 
@@ -288,7 +285,7 @@ var shadedCube = function () {
       distanceX = 0.0;
       time = 0.0;
       parabolicMotion = false;
-      flag = !flag;
+      flag = false;
 
       // Reset nilai maksimum posisi
       maxPosition = vec3(-Infinity, -Infinity, -Infinity);
