@@ -1,4 +1,9 @@
-Menu:
+Anggota : 
+1. Dana Saputra - 5025221003
+2. Birhasani Raka Abiansyah - 5025221115
+3. Arkan Arsalan Amnanullah - 5025221129
+
+Menu :
 1. Render Dodecahedron 3D dengan shading menggunakan WebGL.
 2. Rotasi Objek 3D sepanjang sumbu X, Y, Z atau hentikan/mulai rotasi.
 3. Mode Simulasi Gerakan: Bouncing (memantul) dan Through (melewati).
