@@ -288,7 +288,7 @@ var shadedCube = function () {
       distanceX = 0.0;
       time = 0.0;
       parabolicMotion = false;
-      flag = !flag;
+      flag = false;
 
       // Reset nilai maksimum posisi
       maxPosition = vec3(-Infinity, -Infinity, -Infinity);
